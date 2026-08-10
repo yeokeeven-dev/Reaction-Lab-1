@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reaction Lab — Baking Soda + Vinegar</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#0F1B16;
+    --surface:#182722;
+    --surface-2:#1F332C;
+    --line:#2C4238;
+    --ink:#EDEFE6;
+    --muted:#8FA396;
+    --acid:#C6F135;
+    --coral:#FF8A5B;
+    --fizz:#CFEFE0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 28px 28px,
+      var(--bg);
+    background-blend-mode: overlay, overlay, normal;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:48px 24px 80px;}
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--acid);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(32px, 5vw, 52px);
+    line-height:1.05;
+    margin:0 0 12px;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:var(--muted);
+    font-size:16px;
+    max-width:520px;
+    margin:0 0 40px;
+  }
+
+  .panel{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:28px;
+  }
+  @media(max-width:720px){ .panel{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:28px;
+  }
+  .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:block;
+    margin-bottom:8px;
+  }
+  input[type=number]{
+    width:100%;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:20px;
+    padding:12px 14px;
+    border-radius:3px;
+    margin-bottom:22px;
+  }
+  input[type=number]:focus{
+    outline:2px solid var(--acid);
+    outline-offset:1px;
+  }
+  input[type=range]{
+    width:100%;
+    accent-color: var(--acid);
+    margin-bottom:22px;
+  }
+
+  .readout{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-top:1px solid var(--line);
+  }
+  .readout strong{
+    color:var(--acid);
+    font-weight:500;
+    font-size:15px;
+  }
+  .readout.coral strong{ color:var(--coral); }
+
+  .beaker-zone{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+    position:relative;
+    min-height:340px;
+  }
+  svg#beaker{ overflow:visible; }
+  .caption{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    margin-top:16px;
+    text-align:center;
+  }
+
+  .note{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:24px;
+    line-height:1.5;
+  }
+  .note b{ color:var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Reaction Lab — Prototype 01</div>
+  <h1>How much baking soda<br>for that much vinegar?</h1>
+  <p class="sub">Set your vinegar volume. The lab scales the reaction, shows the baking soda you need, and estimates the CO₂ fizz you'll get.</p>
+
+  <div class="panel">
+    <div class="card">
+      <label class="label" for="vinegar">Vinegar (ml, 5% acetic acid)</label>
+      <input type="number" id="vinegar" value="120" min="0" step="5">
+      <input type="range" id="vinegarSlider" min="0" max="500" value="120" step="5">
+
+      <div class="readout">
+        <span>Baking soda needed</span>
+        <strong id="outSoda">— g</strong>
+      </div>
+      <div class="readout">
+        <span>CO₂ gas produced</span>
+        <strong id="outCO2">— L</strong>
+      </div>
+      <div class="readout coral">
+        <span>Reaction time (approx.)</span>
+        <strong id="outTime">—</strong>
+      </div>
+
+      <p class="note">
+        <b>Why this ratio:</b> acetic acid (CH₃COOH) reacts with sodium bicarbonate (NaHCO₃) roughly 1:1 by mole. 5% vinegar has about 0.00833 mol acetic acid per ml, so we scale baking soda mass to match — with a slight excess baking soda assumed absorbed, since it's cheap and prevents leftover acid smell.
+      </p>
+    </div>
+
+    <div class="card beaker-zone">
+      <svg id="beaker" width="180" height="240" viewBox="0 0 180 240">
+        <path d="M55 20 L55 80 L15 210 Q15 225 30 225 L150 225 Q165 225 165 210 L125 80 L125 20"
+              fill="none" stroke="#2C4238" stroke-width="3"/>
+        <rect x="45" y="8" width="90" height="14" rx="2" fill="none" stroke="#2C4238" stroke-width="3"/>
+        <clipPath id="clip">
+          <path d="M55 20 L55 80 L15 210 Q15 225 30 225 L150 225 Q165 225 165 210 L125 80 L125 20 Z"/>
+        </clipPath>
+        <g clip-path="url(#clip)">
+          <rect id="liquid" x="10" y="230" width="160" height="0" fill="#CFEFE0" opacity="0.55"/>
+          <g id="bubbles"></g>
+        </g>
+      </svg>
+      <div class="caption" id="caption">Enter a volume to fill the beaker</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const vinegarInput = document.getElementById('vinegar');
+  const vinegarSlider = document.getElementById('vinegarSlider');
+  const outSoda = document.getElementById('outSoda');
+  const outCO2 = document.getElementById('outCO2');
+  const outTime = document.getElementById('outTime');
+  const liquid = document.getElementById('liquid');
+  const bubblesGroup = document.getElementById('bubbles');
+  const caption = document.getElementById('caption');
+
+  const MOLES_ACID_PER_ML = 0.00833; // 5% acetic acid vinegar
+  const MOLAR_MASS_NAHCO3 = 84.0;    // g/mol
+  const MOLAR_MASS_CO2 = 44.0;       // g/mol
+  const MOLAR_VOLUME_CO2_L = 24.5;   // L/mol at room temp
+
+  let bubbleTimer = null;
+
+  function calc(vinegarMl){
+    const molesAcid = vinegarMl * MOLES_ACID_PER_ML;
+    const sodaGrams = molesAcid * MOLAR_MASS_NAHCO3 * 1.05; // 5% excess
+    const co2Liters = molesAcid * MOLAR_VOLUME_CO2_L;
+    const seconds = Math.max(4, Math.round(vinegarMl / 15));
+    return { sodaGrams, co2Liters, seconds };
+  }
+
+  function fillBeaker(vinegarMl){
+    const pct = Math.min(vinegarMl / 500, 1);
+    const maxHeight = 190;
+    const h = pct * maxHeight;
+    liquid.setAttribute('y', 230 - h);
+    liquid.setAttribute('height', h);
+  }
+
+  function spawnBubbles(intensity){
+    if(bubbleTimer) clearInterval(bubbleTimer);
+    bubblesGroup.innerHTML = '';
+    let ticks = 0;
+    const maxTicks = 30;
+    bubbleTimer = setInterval(() => {
+      ticks++;
+      const n = Math.round(intensity);
+      for(let i=0;i<n;i++){
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        const x = 30 + Math.random()*120;
+        const r = 2 + Math.random()*4;
+        c.setAttribute('cx', x);
+        c.setAttribute('cy', 220);
+        c.setAttribute('r', r);
+        c.setAttribute('fill', '#EAFBF0');
+        c.setAttribute('opacity', '0.8');
+        bubblesGroup.appendChild(c);
+        const dur = 900 + Math.random()*600;
+        c.animate([
+          { transform: 'translateY(0px)', opacity: 0.8 },
+          { transform: `translateY(-${170+Math.random()*30}px)`, opacity: 0 }
+        ], { duration: dur, easing: 'ease-out' });
+        setTimeout(() => c.remove(), dur);
+      }
+      if(ticks >= maxTicks) clearInterval(bubbleTimer);
+    }, 180);
+  }
+
+  function update(vinegarMl){
+    vinegarMl = Math.max(0, vinegarMl);
+    const { sodaGrams, co2Liters, seconds } = calc(vinegarMl);
+    outSoda.textContent = vinegarMl > 0 ? sodaGrams.toFixed(1) + ' g' : '— g';
+    outCO2.textContent = vinegarMl > 0 ? co2Liters.toFixed(2) + ' L' : '— L';
+    outTime.textContent = vinegarMl > 0 ? '~' + seconds + ' s of fizz' : '—';
+    fillBeaker(vinegarMl);
+    caption.textContent = vinegarMl > 0
+      ? `${vinegarMl} ml vinegar + ${sodaGrams.toFixed(1)} g baking soda`
+      : 'Enter a volume to fill the beaker';
+    if(vinegarMl > 0){
+      spawnBubbles(Math.min(4, 1 + vinegarMl/150));
+    } else if(bubbleTimer){
+      clearInterval(bubbleTimer);
+      bubblesGroup.innerHTML = '';
+    }
+  }
+
+  vinegarInput.addEventListener('input', () => {
+    vinegarSlider.value = vinegarInput.value;
+    update(parseFloat(vinegarInput.value) || 0);
+  });
+  vinegarSlider.addEventListener('input', () => {
+    vinegarInput.value = vinegarSlider.value;
+    update(parseFloat(vinegarSlider.value) || 0);
+  });
+
+  update(parseFloat(vinegarInput.value));
+</script>
+</body>
+</html>
