@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reaction Lab — Friedel–Crafts Acylation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#0F1B16;
+    --surface:#182722;
+    --surface-2:#1F332C;
+    --line:#2C4238;
+    --ink:#EDEFE6;
+    --muted:#8FA396;
+    --acid:#C6F135;
+    --coral:#FF8A5B;
+    --gas:#CFEFE0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 28px 28px,
+      var(--bg);
+    background-blend-mode: overlay, overlay, normal;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:48px 24px 80px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--acid); margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces', serif; font-weight:700;
+    font-size:clamp(32px, 5vw, 52px); line-height:1.05;
+    margin:0 0 12px; letter-spacing:-0.01em;
+  }
+  .sub{ color:var(--muted); font-size:16px; max-width:560px; margin:0 0 40px; }
+
+  .panel{ display:grid; grid-template-columns: 1fr 1fr; gap:28px; }
+  @media(max-width:720px){ .panel{grid-template-columns:1fr;} }
+
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:28px; }
+  .label{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--muted); display:block; margin-bottom:8px;
+  }
+  input[type=number]{
+    width:100%; background:var(--surface-2); border:1px solid var(--line);
+    color:var(--ink); font-family:'IBM Plex Mono', monospace; font-size:20px;
+    padding:12px 14px; border-radius:3px; margin-bottom:22px;
+  }
+  input[type=number]:focus{ outline:2px solid var(--acid); outline-offset:1px; }
+  input[type=range]{ width:100%; accent-color: var(--acid); margin-bottom:22px; }
+
+  .readout{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--muted);
+    display:flex; justify-content:space-between; padding:10px 0; border-top:1px solid var(--line);
+  }
+  .readout strong{ color:var(--acid); font-weight:500; font-size:15px; }
+  .readout.coral strong{ color:var(--coral); }
+
+  .conditions{ margin-top:22px; padding-top:16px; border-top:1px dashed var(--line); }
+  .conditions .label{ margin-bottom:10px; }
+  .conditions ul{ margin:0; padding-left:18px; color:var(--muted); font-size:13px; line-height:1.7; }
+  .conditions li strong{ color:var(--ink); font-weight:500; }
+
+  .scheme{
+    background:var(--surface); border:1px solid var(--line); border-radius:4px;
+    padding:20px; margin-bottom:20px; overflow-x:auto;
+  }
+  .scheme .label{ margin-bottom:14px; }
+
+  .flask-zone{
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    position:relative; min-height:260px; background:var(--surface); border:1px solid var(--line);
+    border-radius:4px; padding:20px;
+  }
+  .caption{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--muted); margin-top:14px; text-align:center; }
+
+  .note{ font-size:13px; color:var(--muted); margin-top:24px; line-height:1.5; }
+  .note b{ color:var(--ink); }
+
+  text.chem{ font-family:'IBM Plex Mono', monospace; font-size:13px; fill:var(--ink); }
+  text.chemsmall{ font-family:'IBM Plex Mono', monospace; font-size:10px; fill:var(--muted); }
+  .bond{ stroke:var(--ink); stroke-width:1.6; fill:none; }
+  .arrowline{ stroke:var(--acid); stroke-width:1.8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Reaction Lab — Prototype 03</div>
+  <h1>Friedel–Crafts acylation<br>of benzene</h1>
+  <p class="sub">Benzene reacts with acetyl chloride under AlCl₃ to install a ketone on the ring. Scale your reagents and see the limiting one, the product mass, and the HCl gas released.</p>
+
+  <div class="scheme">
+    <svg viewBox="0 0 720 150" width="700" height="150">
+      <!-- benzene -->
+      <g transform="translate(10,35)">
+        <polygon class="bond" points="30,0 55,15 55,45 30,60 5,45 5,15"/>
+        <circle class="bond" cx="30" cy="30" r="14"/>
+        <text class="chemsmall" x="0" y="80">benzene</text>
+      </g>
+      <text class="chem" x="90" y="65">+</text>
+      <!-- acetyl chloride -->
+      <g transform="translate(110,50)">
+        <line class="bond" x1="0" y1="15" x2="20" y2="0"/>
+        <text class="chemsmall" x="-14" y="28">H₃C</text>
+        <line class="bond" x1="20" y1="0" x2="40" y2="15"/>
+        <line class="bond" x1="20" y1="0" x2="20" y2="-20"/>
+        <line class="bond" x1="24" y1="0" x2="24" y2="-20"/>
+        <text class="chem" x="12" y="-26">O</text>
+        <text class="chem" x="44" y="20">Cl</text>
+        <text class="chemsmall" x="-10" y="45">acetyl chloride</text>
+      </g>
+      <!-- arrow -->
+      <line class="arrowline" x1="230" y1="45" x2="350" y2="45" marker-end="url(#arrow2)"/>
+      <defs>
+        <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="var(--acid)"/>
+        </marker>
+      </defs>
+      <text class="chemsmall" x="235" y="30">AlCl₃ (1.1 eq)</text>
+      <text class="chemsmall" x="235" y="65">anhydrous, 0°C→RT</text>
+
+      <!-- acetophenone -->
+      <g transform="translate(390,35)">
+        <polygon class="bond" points="30,0 55,15 55,45 30,60 5,45 5,15"/>
+        <circle class="bond" cx="30" cy="30" r="14"/>
+        <line class="bond" x1="55" y1="15" x2="80" y2="0"/>
+        <line class="bond" x1="80" y1="0" x2="80" y2="-22"/>
+        <line class="bond" x1="84" y1="0" x2="84" y2="-22"/>
+        <text class="chem" x="70" y="-28">O</text>
+        <line class="bond" x1="80" y1="0" x2="105" y2="15"/>
+        <text class="chem" x="104" y="20">CH₃</text>
+        <text class="chemsmall" x="0" y="80">acetophenone</text>
+      </g>
+      <text class="chem" x="560" y="45">+ HCl ↑</text>
+    </svg>
+  </div>
+
+  <div class="panel">
+    <div class="card">
+      <label class="label" for="benzene">Benzene (mmol)</label>
+      <input type="number" id="benzene" value="5.0" min="0" step="0.5">
+      <input type="range" id="benzeneSlider" min="0" max="20" value="5.0" step="0.5">
+
+      <label class="label" for="acylchloride">Acetyl chloride (mmol)</label>
+      <input type="number" id="acylchloride" value="6.0" min="0" step="0.5">
+      <input type="range" id="acylSlider" min="0" max="20" value="6.0" step="0.5">
+
+      <div class="readout">
+        <span>Limiting reagent</span>
+        <strong id="outLimiting">—</strong>
+      </div>
+      <div class="readout">
+        <span>AlCl₃ required (1.1 eq)</span>
+        <strong id="outAlCl3">— mmol</strong>
+      </div>
+      <div class="readout">
+        <span>Acetophenone formed</span>
+        <strong id="outProduct">— mg</strong>
+      </div>
+      <div class="readout coral">
+        <span>HCl gas released</span>
+        <strong id="outHCl">— mmol</strong>
+      </div>
+
+      <div class="conditions">
+        <span class="label">Conditions</span>
+        <ul>
+          <li><strong>Anhydrous AlCl₃</strong> — water destroys the catalyst instantly.</li>
+          <li><strong>≥1 equivalent AlCl₃</strong>, not catalytic — it complexes tightly with the ketone product, unlike Friedel–Crafts alkylation.</li>
+          <li><strong>Dry solvent</strong> (e.g. DCM or CS₂), 0°C warming to room temperature.</li>
+          <li>No carbocation rearrangement — the acylium ion is resonance-stabilized, so the product is clean.</li>
+        </ul>
+      </div>
+
+      <p class="note"><b>Why the ring doesn't over-react:</b> the ketone product is deactivating and meta-directing, so once one acyl group is installed, the ring is far less reactive toward a second acylation — the reaction self-limits at mono-substitution.</p>
+    </div>
+
+    <div class="flask-zone">
+      <svg id="flask" width="160" height="220" viewBox="0 0 160 220">
+        <path d="M65 10 L65 70 L20 190 Q20 210 40 210 L120 210 Q140 210 140 190 L95 70 L95 10"
+              fill="none" stroke="#2C4238" stroke-width="3"/>
+        <rect x="55" y="0" width="50" height="12" rx="2" fill="none" stroke="#2C4238" stroke-width="3"/>
+        <clipPath id="flaskclip">
+          <path d="M65 10 L65 70 L20 190 Q20 210 40 210 L120 210 Q140 210 140 190 L95 70 L95 10 Z"/>
+        </clipPath>
+        <g clip-path="url(#flaskclip)">
+          <rect id="fcliquid" x="15" y="215" width="130" height="0" fill="#CFEFE0" opacity="0.5"/>
+          <g id="gasbubbles"></g>
+        </g>
+      </svg>
+      <div class="caption" id="caption">Enter amounts to run the reaction</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const benzeneInput = document.getElementById('benzene');
+  const benzeneSlider = document.getElementById('benzeneSlider');
+  const acylInput = document.getElementById('acylchloride');
+  const acylSlider = document.getElementById('acylSlider');
+
+  const outLimiting = document.getElementById('outLimiting');
+  const outAlCl3 = document.getElementById('outAlCl3');
+  const outProduct = document.getElementById('outProduct');
+  const outHCl = document.getElementById('outHCl');
+  const fcliquid = document.getElementById('fcliquid');
+  const gasGroup = document.getElementById('gasbubbles');
+  const caption = document.getElementById('caption');
+
+  const ACETOPHENONE_MOLAR_MASS = 120.15; // g/mol
+  let gasTimer = null;
+
+  function calc(benzeneMmol, acylMmol){
+    const limitingMmol = Math.min(benzeneMmol, acylMmol);
+    const limitingName = benzeneMmol < acylMmol ? 'Benzene' : (acylMmol < benzeneMmol ? 'Acetyl chloride' : 'Both equal');
+    const alcl3Mmol = acylMmol * 1.1;
+    const productMg = limitingMmol * ACETOPHENONE_MOLAR_MASS;
+    const hclMmol = limitingMmol;
+    return { limitingMmol, limitingName, alcl3Mmol, productMg, hclMmol };
+  }
+
+  function fillFlask(limitingMmol){
+    const pct = Math.min(limitingMmol / 20, 1);
+    const maxHeight = 190;
+    const h = pct * maxHeight;
+    fcliquid.setAttribute('y', 215 - h);
+    fcliquid.setAttribute('height', h);
+  }
+
+  function spawnGas(intensity){
+    if(gasTimer) clearInterval(gasTimer);
+    gasGroup.innerHTML = '';
+    let ticks = 0;
+    const maxTicks = 30;
+    gasTimer = setInterval(() => {
+      ticks++;
+      const n = Math.round(intensity);
+      for(let i=0;i<n;i++){
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        const x = 35 + Math.random()*90;
+        const r = 2 + Math.random()*3.5;
+        c.setAttribute('cx', x);
+        c.setAttribute('cy', 205);
+        c.setAttribute('r', r);
+        c.setAttribute('fill', '#EAFBF0');
+        c.setAttribute('opacity', '0.75');
+        gasGroup.appendChild(c);
+        const dur = 900 + Math.random()*600;
+        c.animate([
+          { transform: 'translateY(0px)', opacity: 0.75 },
+          { transform: `translateY(-${180+Math.random()*30}px)`, opacity: 0 }
+        ], { duration: dur, easing: 'ease-out' });
+        setTimeout(() => c.remove(), dur);
+      }
+      if(ticks >= maxTicks) clearInterval(gasTimer);
+    }, 180);
+  }
+
+  function update(){
+    const benzeneMmol = Math.max(0, parseFloat(benzeneInput.value) || 0);
+    const acylMmol = Math.max(0, parseFloat(acylInput.value) || 0);
+    const { limitingMmol, limitingName, alcl3Mmol, productMg, hclMmol } = calc(benzeneMmol, acylMmol);
+
+    if(benzeneMmol > 0 || acylMmol > 0){
+      outLimiting.textContent = limitingName;
+      outAlCl3.textContent = alcl3Mmol.toFixed(2) + ' mmol';
+      outProduct.textContent = productMg.toFixed(1) + ' mg';
+      outHCl.textContent = hclMmol.toFixed(2) + ' mmol';
+      caption.textContent = `${limitingMmol.toFixed(1)} mmol limiting → ${productMg.toFixed(1)} mg acetophenone`;
+      fillFlask(limitingMmol);
+      spawnGas(Math.min(4, 1 + limitingMmol/6));
+    } else {
+      outLimiting.textContent = '—';
+      outAlCl3.textContent = '— mmol';
+      outProduct.textContent = '— mg';
+      outHCl.textContent = '— mmol';
+      caption.textContent = 'Enter amounts to run the reaction';
+      fillFlask(0);
+      if(gasTimer){ clearInterval(gasTimer); gasGroup.innerHTML = ''; }
+    }
+  }
+
+  benzeneInput.addEventListener('input', () => { benzeneSlider.value = benzeneInput.value; update(); });
+  benzeneSlider.addEventListener('input', () => { benzeneInput.value = benzeneSlider.value; update(); });
+  acylInput.addEventListener('input', () => { acylSlider.value = acylInput.value; update(); });
+  acylSlider.addEventListener('input', () => { acylInput.value = acylSlider.value; update(); });
+
+  update();
+</script>
+</body>
+</html>
